@@ -1,0 +1,36 @@
+﻿  OpenCVApplication.cpp
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(22,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(23,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(54,25): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(179,39): warning C4305: '+=': truncation from 'double' to '_Tp'
+          with
+          [
+              _Tp=float
+          ]
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(181,40): warning C4305: '*=': truncation from 'double' to '_Tp'
+          with
+          [
+              _Tp=float
+          ]
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(239,7): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(337,17): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(339,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(341,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(362,8): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(371,18): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(373,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(375,15): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\OpenCVApplication.cpp(389,34): warning C4838: conversion from '_Tp' to 'float' requires a narrowing conversion
+          with
+          [
+              _Tp=uchar
+          ]
+  OpenCVApplication.vcxproj -> D:\PMI\Year3\Sem2\PI\Proiect\OpenCVApplication-VS2019_OCV451_basic\x64\Debug\OpenCVApplication.exe
+  OpenCV\dll\Debug\opencv_videoio_ffmpeg451_64d.dll
+  OpenCV\dll\Debug\opencv_videoio_msmf451_64d.dll
+  OpenCV\dll\Debug\opencv_world451d.dll
+          3 file(s) copied.
