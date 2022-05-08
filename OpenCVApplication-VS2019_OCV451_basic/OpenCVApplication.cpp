@@ -12,18 +12,57 @@ struct houghValue {
 	int q;
 };
 
+bool isInside(Mat img, int i, int j) {
+	if (i >= 0 && i < img.rows) {
+		if (j >= 0 && j < img.cols)
+		{
+			return true;
+		}
+	}
+	return false;
+
+}
+
 Mat nucleuGaussian(int w) {
 	int k = w / 2;
 	float pi = (float)w / 6.0f;
 
 	Mat nucleu(w, w, CV_32FC1);
-	for (int i = 0; i < w; i++) {
+	/*for (int i = 0; i < w; i++) {
 		for (int j = 0; j < w; j++) {
 			float exponent = (pow((j - k), 2) + pow((i - k), 2)) / (2 * pow(pi, 2));
 			float val = 1.0f / (PI * 2 * pow(pi, 2));
 			nucleu.at<float>(i, j) = (float)exp(-exponent) * val;
+			std::cout << nucleu.at<float>(i, j) << " ";
 		}
-	}
+		std::cout << "\n";
+	}*/
+	nucleu.at<float>(0, 0) = 0.0005;
+	nucleu.at<float>(0, 1) = 0.0050;
+	nucleu.at<float>(0, 2) = 0.0109;
+	nucleu.at<float>(0, 3) = 0.0050;
+	nucleu.at<float>(0, 4) = 0.0005;
+	nucleu.at<float>(1, 0) = 0.0050;
+	nucleu.at<float>(1, 1) = 0.0521;
+	nucleu.at<float>(1, 2) = 0.1139;
+	nucleu.at<float>(1, 3) = 0.0521;
+	nucleu.at<float>(1, 4) = 0.0050;
+	nucleu.at<float>(2, 0) = 0.0109;
+	nucleu.at<float>(2, 1) = 0.1139;
+	nucleu.at<float>(2, 2) = 0.2487;
+	nucleu.at<float>(2, 3) = 0.1139;
+	nucleu.at<float>(2, 4) = 0.0109;
+	nucleu.at<float>(3, 0) = 0.0050;
+	nucleu.at<float>(3, 1) = 0.0521;
+	nucleu.at<float>(3, 2) = 0.1139;
+	nucleu.at<float>(3, 3) = 0.0521;
+	nucleu.at<float>(3, 4) = 0.0050;
+	nucleu.at<float>(4, 0) = 0.0005;
+	nucleu.at<float>(4, 1) = 0.0050;
+	nucleu.at<float>(4, 2) = 0.0109;
+	nucleu.at<float>(4, 3) = 0.0050;
+	nucleu.at<float>(4, 4) = 0.0005;
+
 	return nucleu;
 }
 
@@ -35,7 +74,7 @@ float convolutieTreceJos(Mat src, int x, int y, Mat ng, int w, float c) {
 			sum = sum + ng.at<float>(i, j) * src.at<uchar>(x + i - k, y + j - k);
 		}
 	}
-	return (float)sum / c;
+	return sum / c;
 }
 
 Mat filterGaussian(Mat img, int w) {
@@ -50,8 +89,7 @@ Mat filterGaussian(Mat img, int w) {
 
 	for (int i = k; i < fg.rows - k; i++) {
 		for (int j = k; j < fg.cols - k; j++) {
-			float val1 = (uchar)convolutieTreceJos(img, i, j, ng, w, c);
-			fg.at<uchar>(i, j) = val1;
+			fg.at<uchar>(i, j) = (uchar)convolutieTreceJos(img, i, j, ng, w, c);
 		}
 	}
 
@@ -76,7 +114,7 @@ float valConvTS(Mat H, int x, int y, int k, Mat img) {
 	float val = 0;
 	for (int u = 0; u < H.rows; u++) {
 		for (int v = 0; v < H.cols; v++) {
-			val += (float)H.at<float>(u, v) * img.at<uchar>(x + u - k, y + v - k);
+			val += (float)H.at<float>(u, v)* img.at<uchar>(x + u - k, y + v - k);
 		}
 	}
 	return (float)val;
@@ -169,80 +207,96 @@ Mat sobel(Mat img) {
 
 	ffx = convolutieTreceSus(img, fx);
 	ffy = convolutieTreceSus(img, fy);
+	Mat panta_print = Mat::zeros(img.rows, img.cols, CV_8UC1);
 
-	for (int i = 1; i < panta.rows - 1; i++) {
-		for (int j = 1; j < panta.cols - 1; j++) {
-			panta.at<float>(i, j) = sqrt(ffx.at<float>(i, j) * ffx.at<float>(i, j) + ffy.at<float>(i, j) * ffy.at<float>(i, j));
+	for (int i = 2; i < panta.rows - 2; i++) {
+		for (int j = 2; j < panta.cols - 2; j++) {
+			panta.at<float>(i, j) = (float)sqrt((float)ffx.at<float>(i, j) * ffx.at<float>(i, j) + (float)ffy.at<float>(i, j) * ffy.at<float>(i, j));
+			panta_print.at<uchar>(i, j) = panta.at<float>(i, j) / (4 * sqrt(2));
 
 			directie.at<float>(i, j) = (float)atan2(ffy.at<float>(i, j), ffx.at<float>(i, j));
 			if (directie.at<float>(i, j) < 0) {
 				directie.at<float>(i, j) += 2 * PI;
 			}
-			directie.at<float>(i, j) *= 180 / PI;
+			//directie.at<float>(i, j) *= 180 / PI;
 		}
 	}
 
-	Mat panta_print;
-	normalize(panta, panta_print, 0, 255, NORM_MINMAX, CV_8UC1);
-	imshow(" Sobel1", panta_print);
-
+	imshow("Magnitudine", panta_print);
+	//Mat clone_panta = panta_print.clone();
 	
-	for (int i = 1; i < panta.rows - 1; i++) {
-		for (int j = 1; j < panta.cols - 1; j++) {
-			if ((directie.at<float>(i, j) >= 67.5 && directie.at<float>(i, j) <= 117.5) || 
-				(directie.at<float>(i, j) >= 247.5 && directie.at<float>(i, j) <= 292.5))
+	/*for (int i = 1; i < panta_print.rows - 1; i++) {
+		for (int j = 1; j < panta_print.cols - 1; j++) {
+			if ((directie.at<float>(i, j) > (3 * PI / 8) && directie.at<float>(i, j) < (5 * PI / 8)) ||
+				(directie.at<float>(i, j) > (11 * PI / 8) && directie.at<float>(i, j) < (13 * PI / 8) ))
+				if (clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i + 1, j) || clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i - 1, j)) {
+					panta_print.at<uchar>(i, j) = 0;
+				}
+			if ((directie.at<float>(i, j) > PI/8 && directie.at<float>(i, j) <= (3*PI / 8)) ||
+				(directie.at<float>(i, j) > (9 * PI / 8) && directie.at<float>(i, j) <= (11*PI / 8)))
+				if (clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i - 1, j + 1) || clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i + 1, j - 1)) {
+					panta_print.at<uchar>(i, j) = 0;
+				}
+			if ((directie.at<float>(i, j) > (7 * PI / 8) && directie.at<float>(i, j) <= (9 * PI / 8)) ||
+				(directie.at<float>(i, j) > (15 * PI / 8) || directie.at<float>(i, j) <= (PI / 8)))
+				if (clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i, j - 1) || clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i, j + 1)) {
+					panta_print.at<uchar>(i, j) = 0;
+				}
+			if ((directie.at<float>(i, j) >= (5 * PI / 8) && directie.at<float>(i, j) <= (7*PI / 8)) ||
+				(directie.at<float>(i, j) >= (13* PI / 8) && directie.at<float>(i, j) <= (15 * PI / 8)))
+				if (clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i - 1, j - 1) || clone_panta.at<uchar>(i, j) <= clone_panta.at<uchar>(i + 1, j + 1)) {
+					panta_print.at<uchar>(i, j) = 0;
+				}
+		}
+	}*/
+	Mat panta_clone = panta.clone();
+
+	for (int i = 2; i < panta.rows - 2; i++) {
+		for (int j = 2; j < panta.cols - 2; j++) {
+			if ((directie.at<float>(i, j) > (3 * PI / 8) && directie.at<float>(i, j) < (5 * PI / 8)) ||
+				(directie.at<float>(i, j) > (11 * PI / 8) && directie.at<float>(i, j) < (13 * PI / 8)))
 				if (panta.at<float>(i, j) <= panta.at<float>(i + 1, j) || panta.at<float>(i, j) <= panta.at<float>(i - 1, j)) {
-					panta.at<float>(i, j) = 0;
+					panta_clone.at<float>(i, j) = 0;
 				}
-			if ((directie.at<float>(i, j) >= 22.5 && directie.at<float>(i, j) <= 67.5) ||
-				(directie.at<float>(i, j) >= 202.5 && directie.at<float>(i, j) <= 247.5))
+			if ((directie.at<float>(i, j) > PI / 8 && directie.at<float>(i, j) <= (3 * PI / 8)) ||
+				(directie.at<float>(i, j) > (9 * PI / 8) && directie.at<float>(i, j) <= (11 * PI / 8)))
 				if (panta.at<float>(i, j) <= panta.at<float>(i - 1, j + 1) || panta.at<float>(i, j) <= panta.at<float>(i + 1, j - 1)) {
-					panta.at<float>(i, j) = 0;
+					panta_clone.at<float>(i, j) = 0;
 				}
-			if ((directie.at<float>(i, j) >= 157.5 && directie.at<float>(i, j) <= 202.5) ||
-				(directie.at<float>(i, j) >= 337.5 || directie.at<float>(i, j) <= 22.5))
+			if ((directie.at<float>(i, j) > (7 * PI / 8) && directie.at<float>(i, j) <= (9 * PI / 8)) ||
+				(directie.at<float>(i, j) > (15 * PI / 8) || directie.at<float>(i, j) <= (PI / 8)))
 				if (panta.at<float>(i, j) <= panta.at<float>(i, j - 1) || panta.at<float>(i, j) <= panta.at<float>(i, j + 1)) {
-					panta.at<float>(i, j) = 0;
+					panta_clone.at<float>(i, j) = 0;
 				}
-			if ((directie.at<float>(i, j) >= 117.5 && directie.at<float>(i, j) <= 157.5) ||
-				(directie.at<float>(i, j) >= 292.5 && directie.at<float>(i, j) <= 337.5))
+			if ((directie.at<float>(i, j) >= (5 * PI / 8) && directie.at<float>(i, j) <= (7 * PI / 8)) ||
+				(directie.at<float>(i, j) >= (13 * PI / 8) && directie.at<float>(i, j) <= (15 * PI / 8)))
 				if (panta.at<float>(i, j) <= panta.at<float>(i - 1, j - 1) || panta.at<float>(i, j) <= panta.at<float>(i + 1, j + 1)) {
-					panta.at<float>(i, j) = 0;
+					panta_clone.at<float>(i, j) = 0;
 				}
+			panta_print.at<uchar>(i, j) = panta_clone.at<float>(i, j) / (4 * sqrt(2));
 		}
 	}
 	
-
-	Mat directie_print;
-	normalize(directie, directie_print, 0, 255, NORM_MINMAX, CV_8UC1);
-	normalize(panta, panta_print, 0, 255, NORM_MINMAX, CV_8UC1);
-	Mat ffx_print;
-	normalize(ffx, ffx_print, 0, 255, NORM_MINMAX, CV_8UC1);
-	Mat ffy_print;
-	normalize(ffy, ffy_print, 0, 255, NORM_MINMAX, CV_8UC1);
-
-
-	imshow("Imaginea originala", img);
-	imshow(" Sobel2", panta_print);
-	imshow(" dfx", ffx_print);
-	imshow(" dfy", ffy_print);
-	imshow("Sobel directie", directie_print);
+	imshow("Fil Gaus", img);
+	imshow("ElimNonMaxime", panta_print);
 
 	int *hist = histogram(panta_print);
-	float nrNotM = (float)0.92 * (panta.rows * panta.cols - hist[0]);
+	float nrNotM = (float)0.92 * (panta_print.rows * panta_print.cols - hist[0]);
 	float th = 0;
 	int i = 1;
 
 	while (th < nrNotM && i < 256) {
 		th += hist[i++];
 	}
-	th = i;
+	th = i - 1;
+	std::cout << th << "  " << 0.4 * th << " " << nrNotM << "\n";
+	th = 15;
 
-	for (int i = 0; i < panta.rows; i++) {
-		for (int j = 0; j < panta.cols; j++) {
-			if ((int)panta.at<float>(i, j) < 0.4 * th) {
+	for (int i = 0; i < panta_print.rows; i++) {
+		for (int j = 0; j < panta_print.cols; j++) {
+			if ((int)panta_print.at<uchar>(i, j) < 0.4 * th) {
 				panta_print.at<uchar>(i, j) = 0;
-			}else if ((int)panta.at<float>(i, j) >= 0.4 * th && panta.at<float>(i, j) < th) {
+			}else if ((int)panta_print.at<uchar>(i, j) >= 0.4 * th && panta_print.at<uchar>(i, j) < th) {
 				panta_print.at<uchar>(i, j) = 128;
 			}else {
 				panta_print.at<uchar>(i, j) = 255;
@@ -250,21 +304,21 @@ Mat sobel(Mat img) {
 		}
 	}
 
-	imshow(" Binarizare", panta_print);
+	imshow("Binarizare", panta_print);
 
 	int di[] = { 1, 1, 1, -1, -1, -1, 0, 0 };
 	int dj[] = { -1, 0, 1, -1, 0, 1, 1, -1 };
 	std::queue<Point2i> Q;
 
-	for (int i = 0; i < panta.rows; i++) {
-		for (int j = 0; j < panta.cols; j++) {
+	for (int i = 0; i < panta_print.rows; i++) {
+		for (int j = 0; j < panta_print.cols; j++) {
 			if (panta_print.at<uchar>(i, j) == 255) {
 				Q.push(Point2i(i, j));
 				while (!Q.empty()) {
 					Point2i q = Q.front();
 					Q.pop();
 					for (int i = 0; i < 8; i++) {
-						if (panta_print.at<uchar>(q.x + di[i], q.y + dj[i]) == 128) {
+						if (isInside(panta_print, q.x + di[i], q.y + dj[i]) && panta_print.at<uchar>(q.x + di[i], q.y + dj[i]) == 128) {
 							panta_print.at<uchar>(q.x + di[i], q.y + dj[i]) = 255;
 							Q.push(Point2i(q.x + di[i], q.y + dj[i]));
 						}
@@ -305,7 +359,8 @@ void cannyTest() {
 	while (openFileDlg(fname))
 	{
 		Mat src = imread(fname, IMREAD_GRAYSCALE);
-		Mat fg = filterGaussian(src, 7);
+		Mat fg = filterGaussian(src, 5);
+		imshow("Img Originala", src);
 		sobel(fg);
 		waitKey(0);
 	}
@@ -421,7 +476,7 @@ void proiect(int n) {
 	while (openFileDlg(fname))
 	{
 		Mat src = imread(fname, IMREAD_GRAYSCALE);
-		Mat fg = filterGaussian(src, 7);
+		Mat fg = filterGaussian(src, 5);
 		Mat res_canny = sobel(fg);
 		transformataHough(res_canny, n, src);
 
